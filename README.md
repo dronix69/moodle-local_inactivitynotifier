@@ -140,7 +140,7 @@ Implements `null_provider` according to the Moodle Privacy API.
 ## Requirements
 
 - Moodle 4.1 or higher
-- PHP 7.4+
+- PHP 8.1 +
 - Cron task configured on the server
 
 ---

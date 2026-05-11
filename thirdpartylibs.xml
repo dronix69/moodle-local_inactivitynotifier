@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>.opencode/node_modules</location>
+        <name>OpenCode AI SDK</name>
+        <version>1.3.10</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>.opencode/node_modules/zod</location>
+        <name>Zod</name>
+        <version>3.0.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>

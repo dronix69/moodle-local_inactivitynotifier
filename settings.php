@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-
     $settings = new admin_settingpage(
         'local_inactivitynotifier',
         get_string('pluginname', 'local_inactivitynotifier')

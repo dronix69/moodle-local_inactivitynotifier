@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * Null provider — this plugin does not store any personal data.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
-
     /**
      * Returns the reason string.
      */

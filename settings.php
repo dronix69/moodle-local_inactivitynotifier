@@ -35,7 +35,7 @@ if ($hassiteconfig) {
         'local_inactivitynotifier/inactivedays',
         get_string('setting_inactivedays', 'local_inactivitynotifier'),
         get_string('setting_inactivedays_desc', 'local_inactivitynotifier'),
-        7,          // Default: 7 days.
+        7, // Default: 7 days.
         PARAM_INT
     ));
 

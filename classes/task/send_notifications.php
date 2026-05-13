@@ -36,8 +36,7 @@ class send_notifications extends \core\task\scheduled_task
     /**
      * Returns the human-readable task name (appears in the admin UI).
      */
-    public function get_name(): string
-    {
+    public function get_name(): string {
         return get_string('task_send_notifications', 'local_inactivitynotifier');
     }
 
@@ -45,8 +44,7 @@ class send_notifications extends \core\task\scheduled_task
      * Main task logic.
      * Iterates through all active courses and notifies inactive students.
      */
-    public function execute(): void
-    {
+    public function execute(): void {
         global $DB;
 
         // ── Check if plugin is enabled ────────────────────────────────────────

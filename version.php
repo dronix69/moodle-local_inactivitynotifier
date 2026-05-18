@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_inactivitynotifier'; // Unique plugin name.
-$plugin->version   = 2026051400;                 // Version: YYYYMMDDXX (May 14, 2026).
+$plugin->version   = 2026051800;                 // Version: YYYYMMDDXX (May 18, 2026).
 $plugin->requires  = 2022112800;                 // Minimum Moodle version (Moodle 4.1).
 $plugin->supported = [401, 502];                  // Supported Moodle range: 4.1 to 5.2.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.0.2';
+$plugin->release   = '2.0.3';

@@ -21,9 +21,6 @@
  * @copyright 2026 Daniel Ferrada
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Obtiene los estudiantes inactivos de un curso según los días configurados.
  *

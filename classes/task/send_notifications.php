@@ -47,7 +47,7 @@ class send_notifications extends \core\task\scheduled_task
     public function execute(): void {
         global $DB;
 
-        // ── Check if plugin is enabled ────────────────────────────────────────
+        // Check if plugin is enabled.
         $enabled = get_config('local_inactivitynotifier', 'enabled');
         if (!$enabled) {
             mtrace('local_inactivitynotifier: plugin disabled, skipping execution.');
@@ -57,7 +57,7 @@ class send_notifications extends \core\task\scheduled_task
         $days        = (int) get_config('local_inactivitynotifier', 'inactivedays') ?: 7;
         $onlyvisible = (bool) get_config('local_inactivitynotifier', 'onlyvisible');
 
-        // ── Build course query ─────────────────────────────────────────────────
+        // Build course query.
         $where = 'id <> :siteid';
         $params = ['siteid' => SITEID];
         if ($onlyvisible) {

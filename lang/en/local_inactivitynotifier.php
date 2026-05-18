@@ -24,34 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// ── General ─────────────────────────────────────────────────────────────────
-$string['pluginname'] = 'Inactivity Notifier';
-
-// ── Tarea programada ─────────────────────────────────────────────────────────
-$string['task_send_notifications'] = 'Send inactivity notifications to students';
-
-// ── Configuración (settings.php) ─────────────────────────────────────────────
-$string['setting_inactivedays']      = 'Days of inactivity before notifying';
-$string['setting_inactivedays_desc'] = 'Number of days a student must be inactive before receiving a notification.';
-$string['setting_enabled']           = 'Enable plugin';
-$string['setting_enabled_desc']      = 'When disabled, no notifications will be sent.';
-$string['setting_onlyvisible']       = 'Only notify in visible courses';
-$string['setting_onlyvisible_desc']  = 'If checked, hidden courses will be ignored.';
-$string['setting_notification_mode']     = 'Notification mode';
-$string['setting_notification_mode_desc'] = 'Select how notifications are delivered to students. "Both" respects each user\'s messaging preferences.';
-$string['mode_both']       = 'Popup + Email';
-$string['mode_email_only'] = 'Email only';
-$string['mode_popup_only'] = 'Popup only';
-
-// ── Plantilla de email personalizable ─────────────────────────────────────────
-$string['setting_email_subject']     = 'Custom email subject';
-$string['setting_email_subject_desc'] = 'Custom subject for the email. Leave empty to use the default. Available variables: {{firstname}}, {{coursename}}, {{days}}, {{courseurl}}';
-$string['setting_email_body']        = 'Custom email body (HTML)';
-$string['setting_email_body_desc']   = 'Custom HTML body for the email. Leave empty to use the default. Available variables: {{firstname}}, {{coursename}}, {{days}}, {{courseurl}}';
-
-// ── Mensajes enviados al estudiante ───────────────────────────────────────────
-$string['message_subject'] = 'We miss you in {$a}!';
-
 $string['message_body'] = 'Hi {$a->firstname},
 
 We noticed you haven\'t visited the course "{$a->coursename}" for {$a->days} days.
@@ -60,14 +32,28 @@ Don\'t fall behind! Click the link below to continue your learning:
 {$a->courseurl}
 
 See you soon!';
-
 $string['message_body_html'] = '<p>Hi <strong>{$a->firstname}</strong>,</p>
 <p>We noticed you haven\'t visited the course <strong>"{$a->coursename}"</strong> for <strong>{$a->days} days</strong>.</p>
 <p>Don\'t fall behind! Click the link below to continue your learning:</p>
 <p><a href="{$a->courseurl}">{$a->courseurl}</a></p>
 <p>See you soon! 👋</p>';
-
 $string['message_small'] = 'You have been inactive in {$a} for several days.';
-
-// ── Privacidad (requerido por GDPR) ───────────────────────────────────────────
+$string['message_subject'] = 'We miss you in {$a}!';
+$string['mode_both'] = 'Popup + Email';
+$string['mode_email_only'] = 'Email only';
+$string['mode_popup_only'] = 'Popup only';
+$string['pluginname'] = 'Inactivity Notifier';
 $string['privacy:metadata'] = 'The Inactivity Notifier plugin does not store any personal data. It only reads existing Moodle access logs to determine inactivity.';
+$string['setting_email_body'] = 'Custom email body (HTML)';
+$string['setting_email_body_desc'] = 'Custom HTML body for the email. Leave empty to use the default. Available variables: {{firstname}}, {{coursename}}, {{days}}, {{courseurl}}';
+$string['setting_email_subject'] = 'Custom email subject';
+$string['setting_email_subject_desc'] = 'Custom subject for the email. Leave empty to use the default. Available variables: {{firstname}}, {{coursename}}, {{days}}, {{courseurl}}';
+$string['setting_enabled'] = 'Enable plugin';
+$string['setting_enabled_desc'] = 'When disabled, no notifications will be sent.';
+$string['setting_inactivedays'] = 'Days of inactivity before notifying';
+$string['setting_inactivedays_desc'] = 'Number of days a student must be inactive before receiving a notification.';
+$string['setting_notification_mode'] = 'Notification mode';
+$string['setting_notification_mode_desc'] = 'Select how notifications are delivered to students. "Both" respects each user\'s messaging preferences.';
+$string['setting_onlyvisible'] = 'Only notify in visible courses';
+$string['setting_onlyvisible_desc'] = 'If checked, hidden courses will be ignored.';
+$string['task_send_notifications'] = 'Send inactivity notifications to students';

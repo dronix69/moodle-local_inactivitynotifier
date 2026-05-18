@@ -24,8 +24,6 @@
 
 namespace local_inactivitynotifier\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Null provider — this plugin does not store any personal data.
  */

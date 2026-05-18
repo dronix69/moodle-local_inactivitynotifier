@@ -30,7 +30,7 @@ if ($hassiteconfig) {
         get_string('pluginname', 'local_inactivitynotifier')
     );
 
-    // ── Days of inactivity before notifying ──────────────────────────────────
+    // Days of inactivity before notifying.
     $settings->add(new admin_setting_configtext(
         'local_inactivitynotifier/inactivedays',
         get_string('setting_inactivedays', 'local_inactivitynotifier'),
@@ -39,7 +39,7 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    // ── Enable / Disable plugin globally ─────────────────────────────────────
+    // Enable / Disable plugin globally.
     $settings->add(new admin_setting_configcheckbox(
         'local_inactivitynotifier/enabled',
         get_string('setting_enabled', 'local_inactivitynotifier'),
@@ -47,7 +47,7 @@ if ($hassiteconfig) {
         1           // Enabled by default.
     ));
 
-    // ── Only notify in visible courses ───────────────────────────────────────
+    // Only notify in visible courses.
     $settings->add(new admin_setting_configcheckbox(
         'local_inactivitynotifier/onlyvisible',
         get_string('setting_onlyvisible', 'local_inactivitynotifier'),
@@ -55,7 +55,7 @@ if ($hassiteconfig) {
         1
     ));
 
-    // ── Notification mode ────────────────────────────────────────────────────
+    // Notification mode.
     $settings->add(new admin_setting_configselect(
         'local_inactivitynotifier/notification_mode',
         get_string('setting_notification_mode', 'local_inactivitynotifier'),
@@ -68,7 +68,7 @@ if ($hassiteconfig) {
         ]
     ));
 
-    // ── Custom email subject template ────────────────────────────────────────
+    // Custom email subject template.
     $settings->add(new admin_setting_configtext(
         'local_inactivitynotifier/email_subject',
         get_string('setting_email_subject', 'local_inactivitynotifier'),
@@ -77,7 +77,7 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
-    // ── Custom email body template (HTML) ────────────────────────────────────
+    // Custom email body template (HTML).
     $settings->add(new admin_setting_configtextarea(
         'local_inactivitynotifier/email_body',
         get_string('setting_email_body', 'local_inactivitynotifier'),

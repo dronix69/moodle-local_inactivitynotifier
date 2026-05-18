@@ -33,12 +33,17 @@ function local_inactivitynotifier_get_inactive_users(int $courseid, int $days): 
 
     $threshold = time() - ($days * DAYSECS);
 
+    $now = time();
+
     // Students enrolled in the course with active enrolment and student role.
+    // Only consider enrolments that are currently active in time (timestart/timeend).
     $sql = "SELECT u.id, u.firstname, u.lastname, u.email,
                    COALESCE(ul.timeaccess, 0) AS lastaccess
               FROM {user} u
               JOIN {user_enrolments} ue ON ue.userid = u.id AND ue.status = 0
-              JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = :courseid
+                   AND (ue.timestart = 0 OR ue.timestart <= :now)
+                   AND (ue.timeend = 0 OR ue.timeend > :now2)
+              JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = :courseid AND e.status = 0
               JOIN {role_assignments} ra ON ra.userid = u.id
               JOIN {context} ctx ON ctx.id = ra.contextid
                    AND ctx.contextlevel = :contextlevel
@@ -55,6 +60,8 @@ function local_inactivitynotifier_get_inactive_users(int $courseid, int $days): 
         'contextlevel' => CONTEXT_COURSE,
         'instanceid'   => $courseid,
         'threshold'    => $threshold,
+        'now'          => $now,
+        'now2'         => $now,
     ];
 
     return $DB->get_records_sql($sql, $params);

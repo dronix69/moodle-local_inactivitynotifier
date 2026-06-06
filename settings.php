@@ -55,6 +55,33 @@ if ($hassiteconfig) {
         1
     ));
 
+    // Remind frequency (days to wait between reminders).
+    $settings->add(new admin_setting_configtext(
+        'local_inactivitynotifier/remind_frequency',
+        get_string('setting_remind_frequency', 'local_inactivitynotifier'),
+        get_string('setting_remind_frequency_desc', 'local_inactivitynotifier'),
+        7, // Default: 7 days.
+        PARAM_INT
+    ));
+
+    // Excluded courses list.
+    $settings->add(new admin_setting_configtext(
+        'local_inactivitynotifier/excluded_courses',
+        get_string('setting_excluded_courses', 'local_inactivitynotifier'),
+        get_string('setting_excluded_courses_desc', 'local_inactivitynotifier'),
+        '',
+        PARAM_TEXT
+    ));
+
+    // Excluded categories list.
+    $settings->add(new admin_setting_configtext(
+        'local_inactivitynotifier/excluded_categories',
+        get_string('setting_excluded_categories', 'local_inactivitynotifier'),
+        get_string('setting_excluded_categories_desc', 'local_inactivitynotifier'),
+        '',
+        PARAM_TEXT
+    ));
+
     // Notification mode.
     $settings->add(new admin_setting_configselect(
         'local_inactivitynotifier/notification_mode',
@@ -78,7 +105,7 @@ if ($hassiteconfig) {
     ));
 
     // Custom email body template (HTML).
-    $settings->add(new admin_setting_configtextarea(
+    $settings->add(new admin_setting_confightmleditor(
         'local_inactivitynotifier/email_body',
         get_string('setting_email_body', 'local_inactivitynotifier'),
         get_string('setting_email_body_desc', 'local_inactivitynotifier'),

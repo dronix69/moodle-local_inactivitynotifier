@@ -106,13 +106,24 @@ function local_inactivitynotifier_send_message(stdClass $student, stdClass $cour
         '{{courseurl}}'  => $courseurl,
     ];
 
+    $context = context_course::instance($course->id);
+
     if (!empty($customsubject)) {
         $subject = str_replace(array_keys($vars), array_values($vars), $customsubject);
     }
+    $subject = format_string($subject, true, ['context' => $context]);
 
     if (!empty($custombody)) {
+        // Convert plain text line breaks to HTML breaks if the content does not contain HTML tags.
+        if (strip_tags($custombody) === $custombody) {
+            $custombody = nl2br($custombody);
+        }
         $bodyhtml = str_replace(array_keys($vars), array_values($vars), $custombody);
+        $bodyhtml = format_text($bodyhtml, FORMAT_HTML, ['context' => $context]);
         $bodyplain = html_to_text($bodyhtml);
+    } else {
+        $bodyhtml = format_text($bodyhtml, FORMAT_HTML, ['context' => $context]);
+        $bodyplain = format_text($bodyplain, FORMAT_PLAIN, ['context' => $context]);
     }
 
     if ($mode === 'email_only') {
@@ -127,7 +138,7 @@ function local_inactivitynotifier_send_message(stdClass $student, stdClass $cour
     $message->userto           = $student;
     $message->subject          = $subject;
     $message->fullmessage      = $bodyplain;
-    $message->fullmessageformat = FORMAT_HTML;
+    $message->fullmessageformat = FORMAT_PLAIN;
     $message->fullmessagehtml   = $bodyhtml;
     $message->smallmessage      = get_string('message_small', 'local_inactivitynotifier', $course->fullname);
     $message->notification      = 1;

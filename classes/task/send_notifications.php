@@ -54,39 +54,124 @@ class send_notifications extends \core\task\scheduled_task
             return;
         }
 
-        $days        = (int) get_config('local_inactivitynotifier', 'inactivedays') ?: 7;
-        $onlyvisible = (bool) get_config('local_inactivitynotifier', 'onlyvisible');
+        $days            = (int) get_config('local_inactivitynotifier', 'inactivedays') ?: 7;
+        $onlyvisible     = (bool) get_config('local_inactivitynotifier', 'onlyvisible');
+        $remindfrequency = (int) get_config('local_inactivitynotifier', 'remind_frequency') ?: 7;
 
-        // Build course query.
-        $where = 'id <> :siteid';
-        $params = ['siteid' => SITEID];
+        $excludedcourses    = get_config('local_inactivitynotifier', 'excluded_courses');
+        $excludedcategories = get_config('local_inactivitynotifier', 'excluded_categories');
+
+        $now = time();
+        $threshold = $now - ($days * DAYSECS);
+        $remindthreshold = $now - ($remindfrequency * DAYSECS);
+
+        $sqlwhere = 'u.deleted = 0 AND u.suspended = 0 AND (ul.timeaccess IS NULL OR ul.timeaccess < :threshold)';
+        $sqlparams = [
+            'now' => $now,
+            'now2' => $now,
+            'contextlevel' => CONTEXT_COURSE,
+            'threshold' => $threshold,
+            'remindthreshold' => $remindthreshold,
+            'siteid' => SITEID,
+        ];
+
         if ($onlyvisible) {
-            $where .= ' AND visible = 1';
+            $sqlwhere .= ' AND c.visible = 1';
         }
 
-        // Use recordset to avoid loading all courses into memory at once.
-        $rs = $DB->get_recordset_select('course', $where, $params);
+        if (!empty($excludedcourses)) {
+            $courseslist = array_filter(array_map('intval', explode(',', $excludedcourses)));
+            if (!empty($courseslist)) {
+                list($insql, $inparams) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED, 'excourse', false);
+                $sqlwhere .= " AND c.id $insql";
+                $sqlparams = array_merge($sqlparams, $inparams);
+            }
+        }
+
+        if (!empty($excludedcategories)) {
+            $catslist = array_filter(array_map('intval', explode(',', $excludedcategories)));
+            if (!empty($catslist)) {
+                list($insql, $inparams) = $DB->get_in_or_equal($catslist, SQL_PARAMS_NAMED, 'excat', false);
+                $sqlwhere .= " AND c.category $insql";
+                $sqlparams = array_merge($sqlparams, $inparams);
+            }
+        }
+
+        $sql = "SELECT u.id AS userid, u.firstname, u.lastname, u.email,
+                       c.id AS courseid, c.fullname AS coursefullname, c.shortname AS courseshortname,
+                       c.enablecompletion,
+                       COALESCE(ul.timeaccess, 0) AS lastaccess
+                  FROM {user} u
+                  JOIN {user_enrolments} ue ON ue.userid = u.id AND ue.status = 0
+                       AND (ue.timestart = 0 OR ue.timestart <= :now)
+                       AND (ue.timeend = 0 OR ue.timeend > :now2)
+                  JOIN {enrol} e ON e.id = ue.enrolid AND e.status = 0
+                  JOIN {course} c ON c.id = e.courseid AND c.id <> :siteid
+                  JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel
+                  JOIN {role_assignments} ra ON ra.contextid = ctx.id AND ra.userid = u.id
+                  JOIN {role} r ON r.id = ra.roleid AND r.shortname = 'student'
+             LEFT JOIN {user_lastaccess} ul ON ul.userid = u.id AND ul.courseid = c.id
+             LEFT JOIN (
+                 SELECT userid, courseid, MAX(timesent) AS lastsent
+                   FROM {local_inactivitynotifier_sent}
+               GROUP BY userid, courseid
+             ) log ON log.userid = u.id AND log.courseid = c.id
+                 WHERE $sqlwhere
+                   AND (log.lastsent IS NULL OR log.lastsent < :remindthreshold)
+              ORDER BY c.id";
+
+        $rs = $DB->get_recordset_sql($sql, $sqlparams);
         $totalnotified = 0;
+        $currentcourseid = null;
+        $course = null;
 
-        foreach ($rs as $course) {
-            mtrace("Processing course: [{$course->id}] {$course->fullname}");
+        foreach ($rs as $record) {
+            $courseid = $record->courseid;
 
-            $inactiveusers = local_inactivitynotifier_get_inactive_users($course->id, $days);
-
-            if (empty($inactiveusers)) {
-                mtrace("  → No inactive users.");
-                continue;
+            // Load or build the course object and check completion if needed.
+            if ($courseid !== $currentcourseid) {
+                $currentcourseid = $courseid;
+                // Construct a course object for completion checking and mailing.
+                $course = (object)[
+                    'id' => $record->courseid,
+                    'fullname' => $record->coursefullname,
+                    'shortname' => $record->courseshortname,
+                    'enablecompletion' => $record->enablecompletion,
+                ];
+                mtrace("Processing course: [{$course->id}] {$course->fullname}");
             }
 
-            foreach ($inactiveusers as $student) {
-                $sent = local_inactivitynotifier_send_message($student, $course, $days);
-
-                if ($sent) {
-                    $totalnotified++;
-                    mtrace("  ✓ Notified: {$student->firstname} {$student->lastname} ({$student->email})");
-                } else {
-                    mtrace("  ✗ Failed to notify: {$student->email}");
+            // Exclude students who completed the course.
+            if ($course->enablecompletion) {
+                $completion = new \completion_info($course);
+                if ($completion->is_course_complete($record->userid)) {
+                    mtrace("  → Student [{$record->userid}] completed course, skipping.");
+                    continue;
                 }
+            }
+
+            // Reconstruct the student user object.
+            $student = (object)[
+                'id' => $record->userid,
+                'firstname' => $record->firstname,
+                'lastname' => $record->lastname,
+                'email' => $record->email,
+            ];
+
+            $sent = local_inactivitynotifier_send_message($student, $course, $days);
+
+            if ($sent) {
+                $totalnotified++;
+                // Record the sent notification in the log.
+                $logentry = (object)[
+                    'userid' => $student->id,
+                    'courseid' => $course->id,
+                    'timesent' => $now,
+                ];
+                $DB->insert_record('local_inactivitynotifier_sent', $logentry);
+                mtrace("  ✓ Notified: {$student->firstname} {$student->lastname} ({$student->email})");
+            } else {
+                mtrace("  ✗ Failed to notify: {$student->email}");
             }
         }
         $rs->close();

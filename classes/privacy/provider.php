@@ -28,7 +28,6 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\contextlist;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy provider implementing GDPR compliance for local_inactivitynotifier.
@@ -36,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
 class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider {
-
     /**
      * Return metadata details.
      *
@@ -102,7 +100,7 @@ class provider implements
         }
 
         // Preload all records in bulk to avoid N+1 query performance issues.
-        list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'course');
+        [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'course');
         $params = array_merge(['userid' => $userid], $inparams);
         $records = $DB->get_records_select(
             'local_inactivitynotifier_sent',
@@ -172,7 +170,7 @@ class provider implements
         }
 
         // Delete all matching records in a single bulk DB call to avoid N+1 queries.
-        list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'course');
+        [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'course');
         $params = array_merge(['userid' => $userid], $inparams);
         $DB->delete_records_select(
             'local_inactivitynotifier_sent',

@@ -82,7 +82,7 @@ class send_notifications extends \core\task\scheduled_task
         if (!empty($excludedcourses)) {
             $courseslist = array_filter(array_map('intval', explode(',', $excludedcourses)));
             if (!empty($courseslist)) {
-                list($insql, $inparams) = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED, 'excourse', false);
+                [$insql, $inparams] = $DB->get_in_or_equal($courseslist, SQL_PARAMS_NAMED, 'excourse', false);
                 $sqlwhere .= " AND c.id $insql";
                 $sqlparams = array_merge($sqlparams, $inparams);
             }
@@ -91,7 +91,7 @@ class send_notifications extends \core\task\scheduled_task
         if (!empty($excludedcategories)) {
             $catslist = array_filter(array_map('intval', explode(',', $excludedcategories)));
             if (!empty($catslist)) {
-                list($insql, $inparams) = $DB->get_in_or_equal($catslist, SQL_PARAMS_NAMED, 'excat', false);
+                [$insql, $inparams] = $DB->get_in_or_equal($catslist, SQL_PARAMS_NAMED, 'excat', false);
                 $sqlwhere .= " AND c.category $insql";
                 $sqlparams = array_merge($sqlparams, $inparams);
             }

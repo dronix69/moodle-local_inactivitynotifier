@@ -66,4 +66,5 @@ $string['setting_excluded_courses'] = 'Cursos excluidos';
 $string['setting_excluded_courses_desc'] = 'Lista de IDs de cursos separados por comas que se deben excluir de las notificaciones (ej. 12,34,56).';
 $string['setting_excluded_categories'] = 'Categorías excluidas';
 $string['setting_excluded_categories_desc'] = 'Lista de IDs de categorías de cursos separadas por comas que se deben excluir de las notificaciones.';
+$string['messageprovider:inactivity_notification'] = 'Notificación de inactividad';
 $string['task_send_notifications'] = 'Enviar notificaciones de inactividad a los estudiantes';

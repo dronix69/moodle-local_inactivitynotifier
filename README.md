@@ -16,8 +16,10 @@ local/inactivitynotifier/
 ├── README.md                            ← This documentation
 │
 ├── db/
+│   ├── install.xml                      ← Database table definition (sent log)
 │   ├── messages.php                     ← Message provider registration
-│   └── tasks.php                        ← Cron task definition
+│   ├── tasks.php                        ← Cron task definition
+│   └── upgrade.php                      ← Upgrade script for new tables
 │
 ├── classes/
 │   ├── task/
@@ -26,8 +28,10 @@ local/inactivitynotifier/
 │       └── provider.php                 ← GDPR declaration (null_provider)
 │
 └── lang/
-    └── en/
-        └── local_inactivitynotifier.php ← English language strings
+    ├── en/
+    │   └── local_inactivitynotifier.php ← English language strings
+    └── es/
+        └── local_inactivitynotifier.php ← Spanish language strings
 ```
 
 ---
@@ -46,11 +50,14 @@ local/inactivitynotifier/
 | Setting | Description | Default |
 |---|---|---|
 | Days of inactivity | Days without access before sending a notification | **7** |
+| Remind frequency | Minimum days to wait before resending to the same student in the same course | **7** |
 | Enable plugin | Enable or disable sending | **Yes** |
 | Only visible courses | Ignore hidden courses | **Yes** |
+| Excluded courses | Comma-separated list of course IDs to exclude | *(empty)* |
+| Excluded categories | Comma-separated list of category IDs to exclude | *(empty)* |
 | Notification mode | How to deliver: Popup + Email, Email only, or Popup only | **Popup + Email** |
 | Custom email subject | Subject template (variables: `{{firstname}}`, `{{coursename}}`, `{{days}}`, `{{courseurl}}`) | *(empty = uses default)* |
-| Custom email body (HTML) | HTML body template (same variables available) | *(empty = uses default)* |
+| Custom email body (HTML) | HTML body template (same variables available, WYSIWYG editor) | *(empty = uses default)* |
 
 ---
 
@@ -105,11 +112,17 @@ Daily cron (8:00 AM)
 Plugin enabled? ──NO──► End
        │ YES
        ▼
-Iterate through all active courses (using recordset for memory efficiency)
+Single optimized SQL query joins: users, enrolments, roles (student),
+course, lastaccess, and sent log table
        │
        ▼
-For each course: find students (active enrolment only, not suspended/deleted)
-whose last access is older than N days
+Filters applied:
+  ├─ Active enrolment, not suspended/deleted
+  ├─ Last access older than N days (or never accessed)
+  ├─ Visible courses only (optional)
+  ├─ Excluded courses/categories removed
+  ├─ Completed courses skipped (if completion enabled)
+  └─ Already notified within remind frequency? → Skip
        │
        ▼
 Build message:
@@ -123,6 +136,9 @@ Check notification mode:
   └─ Both → Send via message_send() (follows user preferences)
        │
        ▼
+Record sent notification in local_inactivitynotifier_sent table
+       │
+       ▼
 Log result in cron output
 ```
 
@@ -130,10 +146,10 @@ Log result in cron output
 
 ## Privacy (GDPR)
 
-This plugin **does not store any personal data**.
-It only reads the `mdl_user_lastaccess` table which already exists in Moodle.
-**It never inserts, updates, or deletes any records** in the Moodle database.
-Implements `null_provider` according to the Moodle Privacy API.
+This plugin stores minimal data to prevent duplicate/reminder spam:
+- **`local_inactivitynotifier_sent` table**: logs `userid`, `courseid`, and `timesent` for each notification sent.
+- Users can request **export** or **deletion** of their data via Moodle's privacy API.
+- The plugin implements `metadata\provider` and `request\plugin\provider` with full export and deletion support.
 
 ---
 

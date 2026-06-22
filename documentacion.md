@@ -1,6 +1,6 @@
 # Plugin: Inactivity Notifier para Moodle
 
-**Versión:** 1.0.0 | **Compatibilidad:** Moodle 4.1 a 5.2 | **Licencia:** GPL v3+
+**Versión:** 1.0.2 | **Compatibilidad:** Moodle 4.1 a 5.2 | **Licencia:** GPL v3+
 
 ---
 

@@ -18,6 +18,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid_courseid" UNIQUE="false" FIELDS="userid, courseid"/>
+        <INDEX NAME="userid_courseid_timesent" UNIQUE="false" FIELDS="userid, courseid, timesent"/>
       </INDEXES>
     </TABLE>
   </TABLES>

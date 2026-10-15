@@ -97,7 +97,10 @@ function local_inactivitynotifier_send_message(stdClass $student, stdClass $cour
 
     $customsubject = get_config('local_inactivitynotifier', 'email_subject');
     $custombody    = get_config('local_inactivitynotifier', 'email_body');
-    $mode          = get_config('local_inactivitynotifier', 'notification_mode');
+    $mode = get_config('local_inactivitynotifier', 'notification_mode');
+    if (!in_array($mode, ['both', 'email_only', 'popup_only'], true)) {
+        $mode = 'both';
+    }
 
     $vars = [
         '{{firstname}}'  => $student->firstname,

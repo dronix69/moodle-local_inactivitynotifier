@@ -54,14 +54,23 @@ class send_notifications extends \core\task\scheduled_task
             return;
         }
 
-        $days            = (int) get_config('local_inactivitynotifier', 'inactivedays') ?: 7;
-        $onlyvisible     = (bool) get_config('local_inactivitynotifier', 'onlyvisible');
-        $remindfrequency = (int) get_config('local_inactivitynotifier', 'remind_frequency') ?: 7;
+        $days = (int) get_config('local_inactivitynotifier', 'inactivedays');
+        $days = $days > 0 ? $days : 7;
+        $onlyvisible = (bool) get_config('local_inactivitynotifier', 'onlyvisible');
+        $remindfrequency = (int) get_config('local_inactivitynotifier', 'remind_frequency');
+        $remindfrequency = $remindfrequency > 0 ? $remindfrequency : 7;
 
         $excludedcourses    = get_config('local_inactivitynotifier', 'excluded_courses');
         $excludedcategories = get_config('local_inactivitynotifier', 'excluded_categories');
+        $retentiondays = (int) get_config('local_inactivitynotifier', 'history_retention_days');
+        $retentiondays = $retentiondays > 0 ? $retentiondays : 365;
 
         $now = time();
+        $DB->delete_records_select(
+            'local_inactivitynotifier_sent',
+            'timesent < :cutoff',
+            ['cutoff' => $now - ($retentiondays * DAYSECS)]
+        );
         $threshold = $now - ($days * DAYSECS);
         $remindthreshold = $now - ($remindfrequency * DAYSECS);
 
@@ -97,7 +106,7 @@ class send_notifications extends \core\task\scheduled_task
             }
         }
 
-        $sql = "SELECT u.id AS userid, u.firstname, u.lastname, u.email,
+        $sql = "SELECT DISTINCT u.id AS userid, u.firstname, u.lastname, u.email,
                        c.id AS courseid, c.fullname AS coursefullname, c.shortname AS courseshortname,
                        c.enablecompletion,
                        COALESCE(ul.timeaccess, 0) AS lastaccess

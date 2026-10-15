@@ -59,5 +59,16 @@ function xmldb_local_inactivitynotifier_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026060600, 'local', 'inactivitynotifier');
     }
 
+    if ($oldversion < 2026101500) {
+        $table = new xmldb_table('local_inactivitynotifier_sent');
+        $index = new xmldb_index('userid_courseid_timesent', XMLDB_INDEX_NOTUNIQUE, ['userid', 'courseid', 'timesent']);
+
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2026101500, 'local', 'inactivitynotifier');
+    }
+
     return true;
 }

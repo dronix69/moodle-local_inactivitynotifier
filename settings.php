@@ -82,6 +82,15 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
+    // Retention period for notification history.
+    $settings->add(new admin_setting_configtext(
+        'local_inactivitynotifier/history_retention_days',
+        get_string('setting_history_retention_days', 'local_inactivitynotifier'),
+        get_string('setting_history_retention_days_desc', 'local_inactivitynotifier'),
+        365,
+        PARAM_INT
+    ));
+
     // Notification mode.
     $settings->add(new admin_setting_configselect(
         'local_inactivitynotifier/notification_mode',
